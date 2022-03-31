@@ -267,7 +267,7 @@ public class SelenideTest {
         $$(".menu-item__control").first().click();
         $("[data-test-id='date'] button").click();
 //        int offeredDate = parseInt($(".calendar__day_state_current").getText());
-        int offeredDate = 28;
+        int offeredDate = 31;
         int lastMonthDate = parseInt($$("[data-day]").last().getText());
         if (offeredDate + 4 < lastMonthDate) {
             date = offeredDate + 4;
