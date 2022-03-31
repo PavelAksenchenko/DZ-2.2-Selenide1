@@ -1,165 +1,288 @@
 package ru.netology;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.util.Calendar;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.codeborne.selenide.Condition.appear;
+import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Selectors.withText;
+import static com.codeborne.selenide.Selenide.*;
+import static java.lang.Integer.parseInt;
 
 public class SelenideTest {
-
-    private WebDriver driver;
-
-
-    @BeforeAll
-    static void setUpAll() {
-//        System.setProperty("WebDriver.chrome.driver", "C://Gradle//chromedriver.exe");
-        WebDriverManager.chromedriver().setup();
-    }
+    Calendar calendar = Calendar.getInstance();
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy"); //устанавливаем формат даты
 
     @BeforeEach
-    void seUp() {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--no-sandbox");
-        options.addArguments("--headless");
-        driver = new ChromeDriver(options);
-
+    void setUp() {
+        open("http://localhost:9999/");
     }
 
-    @AfterEach
-    void tearDown() {
-        driver.quit();
-    }
-
+//    @Test
+//    void shouldSendForm() {
+//        $("[data-test-id='city'] input").val("Москва");
+//        calendar.add(Calendar.DAY_OF_MONTH, 4); //добавляем 4 дня к текущей дате
+//        $("[data-test-id='date'] input").doubleClick().val(dateFormat.format(calendar.getTime()));
+//        $("[data-test-id='name'] input").val("Иванов Иван");
+//        $("[data-test-id='phone'] input").val("+79991112233");
+//        $("[data-test-id='agreement'] span").click();
+//        $(withText("Забронировать")).click();
+//        $(withText("Успешно")).should(appear, Duration.ofSeconds(15));
+//    }
+//
+//    @Test
+//    void shouldAcceptЁ() {
+//        $("[data-test-id='city'] input").val("Москва");
+//        calendar.add(Calendar.DAY_OF_MONTH, 4); //добавляем 4 дня к текущей дате
+//        $("[data-test-id='date'] input").doubleClick().val(dateFormat.format(calendar.getTime()));
+//        $("[data-test-id='name'] input").val("Семёнов Пётр");
+//        $("[data-test-id='phone'] input").val("+79991112233");
+//        $("[data-test-id='agreement'] span").click();
+//        $(withText("Забронировать")).click();
+//        $(withText("Успешно")).should(appear, Duration.ofSeconds(15));
+//    }
+//
+//    @Test
+//    void shouldAcceptDash() {
+//        $("[data-test-id='city'] input").val("Москва");
+//        calendar.add(Calendar.DAY_OF_MONTH, 4); //добавляем 4 дня к текущей дате
+//        $("[data-test-id='date'] input").doubleClick().val(dateFormat.format(calendar.getTime()));
+//        $("[data-test-id='name'] input").val("Петрова-Водкина Анна-Мария");
+//        $("[data-test-id='phone'] input").val("+79991112233");
+//        $("[data-test-id='agreement'] span").click();
+//        $(withText("Забронировать")).click();
+//        $(withText("Успешно")).should(appear, Duration.ofSeconds(15));
+//    }
+//
+//    @Test
+//    void shouldNotSendEmptyByDefault() {
+//        $(withText("Забронировать")).click();
+//        $("[data-test-id='city'].input_invalid .input__sub").shouldHave(text("Поле обязательно для заполнения"));
+//    }
+//
+//    @Test
+//    void shouldNotSendWithoutDate() {
+//        $("[data-test-id='city'] input").val("Москва");
+//        $("[data-test-id='date'] input").doubleClick().sendKeys(Keys.DELETE);
+//        $("[data-test-id='name'] input").val("Иванов Иван");
+//        $("[data-test-id='phone'] input").val("+79991112233");
+//        $("[data-test-id='agreement'] span").click();
+//        $(withText("Забронировать")).click();
+//        $("[data-test-id='date'] .input__sub").shouldHave(text("Неверно введена дата"));
+//    }
+//
+//    @Test
+//    void shouldNotSendWithoutName() {
+//        $("[data-test-id='city'] input").val("Москва");
+//        calendar.add(Calendar.DAY_OF_MONTH, 4); //добавляем 4 дня к текущей дате
+//        $("[data-test-id='date'] input").doubleClick().val(dateFormat.format(calendar.getTime()));
+//        $("[data-test-id='phone'] input").val("+79991112233");
+//        $("[data-test-id='agreement'] span").click();
+//        $(withText("Забронировать")).click();
+//        $("[data-test-id='name'].input_invalid .input__sub").shouldHave(text("Поле обязательно для заполнения"));
+//    }
+//
+//    @Test
+//    void shouldNotSendWithoutPhone() {
+//        $("[data-test-id='city'] input").val("Москва");
+//        calendar.add(Calendar.DAY_OF_MONTH, 4); //добавляем 4 дня к текущей дате
+//        $("[data-test-id='date'] input").doubleClick().val(dateFormat.format(calendar.getTime()));
+//        $("[data-test-id='name'] input").val("Иванов Иван");
+//        $("[data-test-id='agreement'] span").click();
+//        $(withText("Забронировать")).click();
+//        $("[data-test-id='phone'].input_invalid .input__sub").shouldHave(text("Поле обязательно для заполнения"));
+//    }
+//
+//    @Test
+//    void shouldNotSendWithoutAgreement() {
+//        $("[data-test-id='city'] input").val("Москва");
+//        calendar.add(Calendar.DAY_OF_MONTH, 4); //добавляем 4 дня к текущей дате
+//        $("[data-test-id='date'] input").doubleClick().val(dateFormat.format(calendar.getTime()));
+//        $("[data-test-id='name'] input").val("Иванов Иван");
+//        $("[data-test-id='phone'] input").val("+79991112233");
+//        $(withText("Забронировать")).click();
+//        $("[data-test-id='agreement'].input_invalid").should(appear);
+//    }
+//
+//    @Test
+//    void shouldNotSendWithoutSurname() {
+//        $("[data-test-id='city'] input").val("Москва");
+//        calendar.add(Calendar.DAY_OF_MONTH, 4); //добавляем 4 дня к текущей дате
+//        $("[data-test-id='date'] input").doubleClick().val(dateFormat.format(calendar.getTime()));
+//        $("[data-test-id='name'] input").val("Иван");
+//        $("[data-test-id='phone'] input").val("+79991112233");
+//        $("[data-test-id='agreement'] span").click();
+//        $(withText("Забронировать")).click();
+//        $("[data-test-id='name'].input_invalid .input__sub").shouldHave(text("Поле обязательно для заполнения"));
+//    }
+//
+//    @Test
+//    void shouldNotSendWithDashForName() {
+//        $("[data-test-id='city'] input").val("Москва");
+//        calendar.add(Calendar.DAY_OF_MONTH, 4); //добавляем 4 дня к текущей дате
+//        $("[data-test-id='date'] input").doubleClick().val(dateFormat.format(calendar.getTime()));
+//        $("[data-test-id='name'] input").val("-");
+//        $("[data-test-id='phone'] input").val("+79991112233");
+//        $("[data-test-id='agreement'] span").click();
+//        $(withText("Забронировать")).click();
+//        $("[data-test-id='name'].input_invalid .input__sub").shouldHave(text("Поле обязательно для заполнения"));
+//    }
+//
+//    @Test
+//    void shouldNotSendCityOutOfList() {
+//        $("[data-test-id='city'] input").val("Королев");
+//        calendar.add(Calendar.DAY_OF_MONTH, 4); //добавляем 4 дня к текущей дате
+//        $("[data-test-id='date'] input").doubleClick().val(dateFormat.format(calendar.getTime()));
+//        $("[data-test-id='name'] input").val("Иванов Иван");
+//        $("[data-test-id='phone'] input").val("+79991112233");
+//        $("[data-test-id='agreement'] span").click();
+//        $(withText("Забронировать")).click();
+//        $("[data-test-id='city'].input_invalid .input__sub").shouldHave(text(
+//                "Доставка в выбранный город недоступна"));
+//    }
+//
+//    @Test
+//    void shouldNotAcceptDateInPast() {
+//        $("[data-test-id='city'] input").val("Москва");
+//        $("[data-test-id='date'] input").doubleClick().sendKeys(
+//                "0", "1", ".", "0", "3", ".", "2", "0", "2", "2");
+//        $("[data-test-id='name'] input").val("Иванов Иван");
+//        $("[data-test-id='phone'] input").val("+79991112233");
+//        $("[data-test-id='agreement'] span").click();
+//        $(withText("Забронировать")).click();
+//        $("[data-test-id='date'] .input__sub").shouldHave(text(
+//                "Заказ на выбранную дату невозможен"));
+//    }
+//
+//    @Test
+//    void shouldNotSendLatinName() {
+//        $("[data-test-id='city'] input").val("Москва");
+//        calendar.add(Calendar.DAY_OF_MONTH, 4); //добавляем 4 дня к текущей дате
+//        $("[data-test-id='date'] input").doubleClick().val(dateFormat.format(calendar.getTime()));
+//        $("[data-test-id='name'] input").val("Ivanov Ivan");
+//        $("[data-test-id='phone'] input").val("+79991112233");
+//        $("[data-test-id='agreement'] span").click();
+//        $(withText("Забронировать")).click();
+//        $("[data-test-id='name'].input_invalid .input__sub").shouldHave(text(
+//                "Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы."));
+//    }
+//
+//    @Test
+//    void shouldNotSendSpecialSymbolsForName() {
+//        $("[data-test-id='city'] input").val("Москва");
+//        calendar.add(Calendar.DAY_OF_MONTH, 4); //добавляем 4 дня к текущей дате
+//        $("[data-test-id='date'] input").doubleClick().val(dateFormat.format(calendar.getTime()));
+//        $("[data-test-id='name'] input").val("!#&?");
+//        $("[data-test-id='phone'] input").val("+79991112233");
+//        $("[data-test-id='agreement'] span").click();
+//        $(withText("Забронировать")).click();
+//        $("[data-test-id='name'].input_invalid .input__sub").shouldHave(text(
+//                "Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы."));
+//    }
+//
+//    @Test
+//    void shouldNotSendNumbersInName() {
+//        $("[data-test-id='city'] input").val("Москва");
+//        calendar.add(Calendar.DAY_OF_MONTH, 4); //добавляем 4 дня к текущей дате
+//        $("[data-test-id='date'] input").doubleClick().val(dateFormat.format(calendar.getTime()));
+//        $("[data-test-id='name'] input").val("Иван 1");
+//        $("[data-test-id='phone'] input").val("+79991112233");
+//        $("[data-test-id='agreement'] span").click();
+//        $(withText("Забронировать")).click();
+//        $("[data-test-id='name'].input_invalid .input__sub").shouldHave(text(
+//                "Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы."));
+//    }
+//
+//    @Test
+//    void shouldNotSendWithoutPlusInPhone() {
+//        $("[data-test-id='city'] input").val("Москва");
+//        calendar.add(Calendar.DAY_OF_MONTH, 4); //добавляем 4 дня к текущей дате
+//        $("[data-test-id='date'] input").doubleClick().val(dateFormat.format(calendar.getTime()));
+//        $("[data-test-id='name'] input").val("Иванов Иван");
+//        $("[data-test-id='phone'] input").val("79991112233");
+//        $("[data-test-id='agreement'] span").click();
+//        $(withText("Забронировать")).click();
+//        $("[data-test-id='phone'].input_invalid .input__sub").shouldHave(text(
+//                "Телефон указан неверно. Должно быть 11 цифр, например, +79012345678."));
+//    }
+//
+//    @Test
+//    void shouldNotSendLessDigitsInPhone() {
+//        $("[data-test-id='city'] input").val("Москва");
+//        calendar.add(Calendar.DAY_OF_MONTH, 4); //добавляем 4 дня к текущей дате
+//        $("[data-test-id='date'] input").doubleClick().val(dateFormat.format(calendar.getTime()));
+//        $("[data-test-id='name'] input").val("Иванов Иван");
+//        $("[data-test-id='phone'] input").val("+7999111222");
+//        $("[data-test-id='agreement'] span").click();
+//        $(withText("Забронировать")).click();
+//        $("[data-test-id='phone'].input_invalid .input__sub").shouldHave(text(
+//                "Телефон указан неверно. Должно быть 11 цифр, например, +79012345678."));
+//    }
 
     @Test
-    void shouldTestHappyPath() {
-        driver.get("http://localhost:9999/");
-        List<WebElement> elements = driver.findElements(By.cssSelector("input.input__control"));
-        elements.get(0).sendKeys("Борис-Морис");
-        elements.get(1).sendKeys("+71234567899");
-        driver.findElement(By.className("checkbox")).click();
-        driver.findElement(By.className("checkbox")).isSelected();
-        driver.findElement(By.className("button")).click();
-        System.out.println();
-
-        String actual = driver.findElement(By.className("paragraph")).getText().trim();
-        String expected = ("Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайшее время.");
-
-        assertEquals(expected, actual);
-
+    void shouldUseCityList() {
+        $("[data-test-id='city'] input").val("ко");
+        $$(".menu-item__control").get(2).click();
+        calendar.add(Calendar.DAY_OF_MONTH, 4); //добавляем 4 дня к текущей дате
+        $("[data-test-id='date'] input").doubleClick().val(dateFormat.format(calendar.getTime()));
+        $("[data-test-id='name'] input").val("Иванов Иван");
+        $("[data-test-id='phone'] input").val("+79991112233");
+        $("[data-test-id='agreement'] span").click();
+        $(withText("Забронировать")).click();
+        $(withText("Успешно")).should(appear, Duration.ofSeconds(15));
     }
 
     @Test
-    void shouldTestHappyPathWhiteSpaceName() {
-        driver.get("http://localhost:9999/");
-        List<WebElement> elements = driver.findElements(By.cssSelector("input.input__control"));
-        elements.get(0).sendKeys("Лил Джон");
-        elements.get(1).sendKeys("+71234567899");
-        driver.findElement(By.cssSelector("span.checkbox__box")).click();
-        driver.findElement(By.className("checkbox")).isSelected();
-        driver.findElement(By.className("button")).click();
-        System.out.println();
-
-        String actual = driver.findElement(By.className("paragraph")).getText().trim();
-        String expected = ("Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайшее время.");
-
-        assertEquals(expected, actual);
-
-    }
-
-    @Test
-    void shouldTestBlankName() {
-        driver.get("http://localhost:9999/");
-        List<WebElement> elements = driver.findElements(By.cssSelector("input.input__control"));
-        elements.get(0).sendKeys("");
-        {
-            if (elements.get(0) == null) {
-                driver.findElement(By.className("input__sub")).getText();
-            }
+    void shouldUseWebCalendarWithinCurrentMonth() {
+        int date;
+        $("[data-test-id='city'] input").val("ко");
+        $$(".menu-item__control").first().click();
+        $("[data-test-id='date'] button").click();
+        int offeredDate = parseInt($(".calendar__day_state_current").getText());
+        int lastMonthDate = parseInt($$("[data-day]").last().getText());
+        if (offeredDate + 4 < lastMonthDate) {
+            date = offeredDate + 4;
+            $$("[data-day]").filterBy(text(String.valueOf(date))).first().click();
+        } else {
+            date = lastMonthDate - offeredDate + 4;
+            $("[data-step='1'].calendar__arrow_direction_right").click();
+            $$("[data-day]").filterBy(text(String.valueOf(date))).first().click();
         }
-        elements.get(1).sendKeys("+71234567899");
-        driver.findElement(By.className("checkbox")).click();
-        driver.findElement(By.className("button")).click();
-        System.out.println();
-
-        String actual = driver.findElement(By.className("input__sub")).getText();
-        String expected = ("Поле обязательно для заполнения");
-
-        assertEquals(expected, actual);
-
+        System.out.println(date);
+        System.out.println(lastMonthDate);
+        $("[data-test-id='name'] input").val("Иванов Иван");
+        $("[data-test-id='phone'] input").val("+79991112233");
+        $("[data-test-id='agreement'] span").click();
+        $(withText("Забронировать")).click();
+        $(withText("Успешно")).should(appear, Duration.ofSeconds(15));
     }
-
     @Test
-    void shouldTestBlankPhone() {
-        driver.get("http://localhost:9999/");
-        List<WebElement> elements = driver.findElements(By.cssSelector("input.input__control"));
-        elements.get(0).sendKeys("Борис");
-        elements.get(1).sendKeys("");
-        {
-            if (elements.get(1) == null) {
-                driver.findElement(By.cssSelector("#root > div > form > div:nth-child(2) > span > span > span.input__sub")).getText();
-            }
+    void shouldUseWebCalendarNextMonth() {
+        int date;
+        $("[data-test-id='city'] input").val("ко");
+        $$(".menu-item__control").first().click();
+        $("[data-test-id='date'] button").click();
+//        int offeredDate = parseInt($(".calendar__day_state_current").getText());
+        int offeredDate = 28;
+        int lastMonthDate = parseInt($$("[data-day]").last().getText());
+        if (offeredDate + 4 < lastMonthDate) {
+            date = offeredDate + 4;
+            $$("[data-day]").filterBy(text(String.valueOf(date))).first().click();
+        } else {
+            date = lastMonthDate - offeredDate + 4;
+            $("[data-step='1'].calendar__arrow_direction_right").click();
+            $$("[data-day]").filterBy(text(String.valueOf(date))).first().click();
         }
-        driver.findElement(By.className("checkbox")).click();
-        driver.findElement(By.className("button")).click();
-        System.out.println();
-
-        String actual = driver.findElement(By.cssSelector("#root > div > form > div:nth-child(2) > span > span > span.input__sub")).getText();
-        String expected = ("Поле обязательно для заполнения");
-
-        assertEquals(expected, actual);
-
+        System.out.println(date);
+        System.out.println(lastMonthDate);
+        $("[data-test-id='name'] input").val("Иванов Иван");
+        $("[data-test-id='phone'] input").val("+79991112233");
+        $("[data-test-id='agreement'] span").click();
+        $(withText("Забронировать")).click();
+        $(withText("Успешно")).should(appear, Duration.ofSeconds(15));
     }
-
-    @Test
-    void shouldTestEnglishName() {
-        driver.get("http://localhost:9999/");
-        List<WebElement> elements = driver.findElements(By.cssSelector("input.input__control"));
-        elements.get(0).sendKeys("Boris");
-        elements.get(1).sendKeys("+71234567899");
-        driver.findElement(By.className("checkbox")).click();
-        driver.findElement(By.className("button")).click();
-        System.out.println();
-
-        String actual = driver.findElement(By.cssSelector("div span.input__sub")).getText();
-        String expected = ("Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы.");
-
-        assertEquals(expected, actual);
-
-    }
-
-    @Test
-    void shouldTestPhoneWithoutPlus() {
-        driver.get("http://localhost:9999/");
-        List<WebElement> elements = driver.findElements(By.cssSelector("input.input__control"));
-        elements.get(0).sendKeys("Борис");
-        elements.get(1).sendKeys("79155175236");
-        {
-            if (elements.get(1) == null) {
-                driver.findElement(By.cssSelector("#root > div > form > div:nth-child(2) > span > span > span.input__sub")).getText();
-            }
-        }
-        driver.findElement(By.className("checkbox")).click();
-        driver.findElement(By.className("button")).click();
-        System.out.println();
-
-        String actual = driver.findElement(By.cssSelector("#root > div > form > div:nth-child(2) > span > span > span.input__sub")).getText();
-        String expected = ("Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.");
-
-        assertEquals(expected, actual);
-
-    }
-
-
 }
