@@ -1,165 +1,150 @@
 package ru.netology;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.Configuration;
+import com.codeborne.selenide.Selectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 
-import java.util.List;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.Locale;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.codeborne.selenide.Condition.*;
+import static com.codeborne.selenide.Configuration.holdBrowserOpen;
+import static com.codeborne.selenide.Selectors.byCssSelector;
+import static com.codeborne.selenide.Selectors.withText;
+import static com.codeborne.selenide.Selenide.*;
 
 public class SeleniumTest {
 
     private WebDriver driver;
+    private int days;
 
-
-    @BeforeAll
-    static void setUpAll() {
-//        System.setProperty("WebDriver.chrome.driver", "C://Gradle//chromedriver.exe");
-        WebDriverManager.chromedriver().setup();
+    public String availableDate(int days) {
+        return
+                LocalDate.now().plusDays(days).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
     }
 
     @BeforeEach
-    void seUp() {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--no-sandbox");
-        options.addArguments("--headless");
-        driver = new ChromeDriver(options);
-
+    void openBrowser() {
+        open("http://localhost:9999");
     }
-
-    @AfterEach
-    void tearDown() {
-        driver.quit();
-    }
-
 
     @Test
     void shouldTestHappyPath() {
-        driver.get("http://localhost:9999/");
-        List<WebElement> elements = driver.findElements(By.cssSelector("input.input__control"));
-        elements.get(0).sendKeys("Борис-Морис");
-        elements.get(1).sendKeys("+71234567899");
-        driver.findElement(By.className("checkbox")).click();
-        driver.findElement(By.className("checkbox")).isSelected();
-        driver.findElement(By.className("button")).click();
-        System.out.println();
+        String planningDate = availableDate(3);
 
-        String actual = driver.findElement(By.className("paragraph")).getText().trim();
-        String expected = ("Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайшее время.");
-
-        assertEquals(expected, actual);
-
-    }
-
-    @Test
-    void shouldTestHappyPathWhiteSpaceName() {
-        driver.get("http://localhost:9999/");
-        List<WebElement> elements = driver.findElements(By.cssSelector("input.input__control"));
-        elements.get(0).sendKeys("Лил Джон");
-        elements.get(1).sendKeys("+71234567899");
-        driver.findElement(By.cssSelector("span.checkbox__box")).click();
-        driver.findElement(By.className("checkbox")).isSelected();
-        driver.findElement(By.className("button")).click();
-        System.out.println();
-
-        String actual = driver.findElement(By.className("paragraph")).getText().trim();
-        String expected = ("Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайшее время.");
-
-        assertEquals(expected, actual);
-
-    }
-
-    @Test
-    void shouldTestBlankName() {
-        driver.get("http://localhost:9999/");
-        List<WebElement> elements = driver.findElements(By.cssSelector("input.input__control"));
-        elements.get(0).sendKeys("");
-        {
-            if (elements.get(0) == null) {
-                driver.findElement(By.className("input__sub")).getText();
-            }
-        }
-        elements.get(1).sendKeys("+71234567899");
-        driver.findElement(By.className("checkbox")).click();
-        driver.findElement(By.className("button")).click();
-        System.out.println();
-
-        String actual = driver.findElement(By.className("input__sub")).getText();
-        String expected = ("Поле обязательно для заполнения");
-
-        assertEquals(expected, actual);
-
-    }
-
-    @Test
-    void shouldTestBlankPhone() {
-        driver.get("http://localhost:9999/");
-        List<WebElement> elements = driver.findElements(By.cssSelector("input.input__control"));
-        elements.get(0).sendKeys("Борис");
-        elements.get(1).sendKeys("");
-        {
-            if (elements.get(1) == null) {
-                driver.findElement(By.cssSelector("#root > div > form > div:nth-child(2) > span > span > span.input__sub")).getText();
-            }
-        }
-        driver.findElement(By.className("checkbox")).click();
-        driver.findElement(By.className("button")).click();
-        System.out.println();
-
-        String actual = driver.findElement(By.cssSelector("#root > div > form > div:nth-child(2) > span > span > span.input__sub")).getText();
-        String expected = ("Поле обязательно для заполнения");
-
-        assertEquals(expected, actual);
-
+        $x("//input[@placeholder=\"Город\"]").val("Иркутск");
+        $x("//input[@placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
+        $x("//input[@name=\"name\"]").val("Григорий Ефимов-Пахомов");
+        $x("//*[@data-test-id=\"phone\"]/span/span/input").val("+79125357174");
+        $x("//*[@class=\"checkbox__text\"]").click();
+        $x("//*[@class=\"button__text\"]").click();
+        $x("//*[@data-test-id=\"notification\"]").should(visible, Duration.ofSeconds(15));
+        $x("//*[@class='notification__content']").
+                shouldHave(Condition.text("Встреча успешно забронирована на " + planningDate), Duration.ofSeconds(15));
     }
 
     @Test
     void shouldTestEnglishName() {
-        driver.get("http://localhost:9999/");
-        List<WebElement> elements = driver.findElements(By.cssSelector("input.input__control"));
-        elements.get(0).sendKeys("Boris");
-        elements.get(1).sendKeys("+71234567899");
-        driver.findElement(By.className("checkbox")).click();
-        driver.findElement(By.className("button")).click();
-        System.out.println();
+        String planningDate = availableDate(3);
 
-        String actual = driver.findElement(By.cssSelector("div span.input__sub")).getText();
-        String expected = ("Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы.");
-
-        assertEquals(expected, actual);
+        $x("//input[@placeholder=\"Город\"]").val("Екатеринбург");
+        $x("//input[@placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
+        $x("//input[@name=\"name\"]").val("Bruce Willis");
+        $x("//*[@data-test-id=\"phone\"]/span/span/input").val("+142536789101");
+        $x("//*[@class=\"checkbox__text\"]").click();
+        $x("//*[@class=\"button__text\"]").click();
+        $(withText("неверно")).should(visible, Duration.ofSeconds(5));
 
     }
 
     @Test
-    void shouldTestPhoneWithoutPlus() {
-        driver.get("http://localhost:9999/");
-        List<WebElement> elements = driver.findElements(By.cssSelector("input.input__control"));
-        elements.get(0).sendKeys("Борис");
-        elements.get(1).sendKeys("79155175236");
-        {
-            if (elements.get(1) == null) {
-                driver.findElement(By.cssSelector("#root > div > form > div:nth-child(2) > span > span > span.input__sub")).getText();
-            }
-        }
-        driver.findElement(By.className("checkbox")).click();
-        driver.findElement(By.className("button")).click();
-        System.out.println();
+    void shouldTestUnhappyDatePath() {
+        String planningDate = availableDate(1);
 
-        String actual = driver.findElement(By.cssSelector("#root > div > form > div:nth-child(2) > span > span > span.input__sub")).getText();
-        String expected = ("Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.");
-
-        assertEquals(expected, actual);
-
+        $x("//input[@placeholder=\"Город\"]").val("Иркутск");
+        $x("//input[@placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
+        $x("//input[@name=\"name\"]").val("Степан Чижиков");
+        $x("//*[@data-test-id=\"phone\"]/span/span/input").val("+79125357174");
+        $x("//*[@class=\"checkbox__text\"]").click();
+        $x("//*[@class=\"button__text\"]").click();
+        $(withText("невозможен")).should(visible, Duration.ofSeconds(5));
     }
 
+    @Test
+    void shouldTestYoLetterAndI() {
+        String planningDate = availableDate(5);
+
+        $x("//input[@placeholder=\"Город\"]").val("Иркутск");
+        $x("//input[@placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
+        $x("//input[@name=\"name\"]").val("Йоаким Ёжиков");
+        $x("//*[@data-test-id=\"phone\"]/span/span/input").val("+79125357174");
+        $x("//*[@class=\"checkbox__text\"]").click();
+        $x("//*[@class=\"button__text\"]").click();
+        $(withText("неверно")).should(visible, Duration.ofSeconds(5));
+    }
+
+    @Test
+    void shouldTestPhoneWithoutPlusSign() {
+        String planningDate = availableDate(5);
+
+        $x("//input[@placeholder=\"Город\"]").val("Иркутск");
+        $x("//input[@placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
+        $x("//input[@name=\"name\"]").val("Станис ");
+        $x("//*[@data-test-id=\"phone\"]/span/span/input").val("89125357174");
+        $x("//*[@class=\"checkbox__text\"]").click();
+        $x("//*[@class=\"button__text\"]").click();
+        $(withText("11 цифр")).should(visible, Duration.ofSeconds(5));
+    }
+
+    @Test
+    void shouldTestPhoneLessThen11Digits() {
+        String planningDate = availableDate(5);
+
+        $x("//input[@placeholder=\"Город\"]").val("Санкт-Петербург");
+        $x("//input[@placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
+        $x("//input[@name=\"name\"]").val("Станис ");
+        $x("//*[@data-test-id=\"phone\"]/span/span/input").val("+7912535717");
+        $x("//*[@class=\"checkbox__text\"]").click();
+        $x("//*[@class=\"button__text\"]").click();
+        $(withText("11 цифр")).should(visible, Duration.ofSeconds(5));
+    }
+
+    @Test
+    void shouldTestCityInEnglish() {
+        String planningDate = availableDate(5);
+
+        $x("//input[@placeholder=\"Город\"]").val("Washington D.C.");
+        $x("//input[@placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
+        $x("//input[@name=\"name\"]").val("Степан Чижиков");
+        $x("//*[@data-test-id=\"phone\"]/span/span/input").val("+79125357174");
+        $x("//*[@class=\"checkbox__text\"]").click();
+        $x("//*[@class=\"button__text\"]").click();
+        $(withText("Доставка в выбранный город недоступна")).should(visible, Duration.ofSeconds(5));
+    }
+
+    @Test
+    void shouldTestEnglishCity() {
+        String planningDate = availableDate(5);
+
+        $x("//input[@placeholder=\"Город\"]").val("Вашингтон");
+        $x("//input[@placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
+        $x("//input[@name=\"name\"]").val("Степан Чижиков");
+        $x("//*[@data-test-id=\"phone\"]/span/span/input").val("+79125357174");
+        $x("//*[@class=\"checkbox__text\"]").click();
+        $x("//*[@class=\"button__text\"]").click();
+        $(withText("Доставка в выбранный город недоступна")).should(visible, Duration.ofSeconds(5));
+    }
 
 }
